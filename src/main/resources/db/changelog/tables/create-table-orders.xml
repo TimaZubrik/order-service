@@ -12,7 +12,7 @@
         <column name="user_id" type="uuid">
             <constraints nullable="false"/>
         </column>
-        <column name="status" type="varchar(12)">
+        <column name="status" type="varchar(20)">
             <constraints nullable="false"/>
         </column>
         <column name="creation_date" type="timestamp">
