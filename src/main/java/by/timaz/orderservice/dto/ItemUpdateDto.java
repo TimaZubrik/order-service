@@ -9,20 +9,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDto implements Serializable {
-    private UUID id;
-
-    @NotBlank(message = "Name cannot be empty")
+public class ItemUpdateDto {
     @Pattern(
             regexp = "^[\\p{L}]+(?:[ \\p{Pd}'’][\\p{L}]+)*$",
             flags = Pattern.Flag.UNICODE_CASE,
@@ -33,9 +26,6 @@ public class ItemDto implements Serializable {
             message = "Minimum price is 0.01")
     @Digits(integer = 8,
             fraction = 2,
-    message = "Price must have 8 numbers before the decimal point and 2 after")
+            message = "Price must have 8 numbers before the decimal point and 2 after")
     private BigDecimal price;
-
-    @Builder.Default
-    private List<OrderItemDto> orderItems = new ArrayList<>();
 }

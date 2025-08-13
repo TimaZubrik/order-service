@@ -3,12 +3,14 @@ package by.timaz.orderservice.service;
 import by.timaz.orderservice.dao.entity.Item;
 import by.timaz.orderservice.dao.repository.ItemRepository;
 import by.timaz.orderservice.dto.ItemDto;
+import by.timaz.orderservice.dto.ItemUpdateDto;
 import by.timaz.orderservice.exceptions.ResourceNotFoundException;
 import by.timaz.orderservice.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,14 +38,14 @@ public class ItemService {
                 .orElseThrow(()-> new ResourceNotFoundException("Item", "id", id.toString())));
     }
 
-    public List<ItemDto> findItemsByName(String name) {
-        List<Item> items = itemRepository.findItemsByName(name);
+    public List<ItemDto> findItemsByNames(Collection<String> names) {
+        List<Item> items = itemRepository.findItemsByNameIn(names);
         return items.stream()
                      .map(itemMapper::toItemDto)
                      .toList();
     }
     @Transactional
-    public ItemDto updateItem(ItemDto itemDto, UUID id) {
+    public ItemDto updateItem(ItemUpdateDto itemDto, UUID id) {
 
         return itemMapper.toItemDto(
                 itemMapper.updateItem(

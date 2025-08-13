@@ -4,6 +4,7 @@ import by.timaz.orderservice.dao.entity.Order;
 import by.timaz.orderservice.dao.entity.OrderStatus;
 import by.timaz.orderservice.dao.repository.OrderRepository;
 import by.timaz.orderservice.dto.OrderDto;
+import by.timaz.orderservice.dto.OrderUpdateDto;
 import by.timaz.orderservice.exceptions.ResourceNotFoundException;
 import by.timaz.orderservice.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,8 @@ public class OrderService {
                 .toList();
     }
 
-    public List<OrderDto> findByUserId(UUID userId) {
-        List<Order> orders = orderRepository.findByUserId(userId);
+    public List<OrderDto> findByUserIds(Collection<UUID> userIds) {
+        List<Order> orders = orderRepository.findByUserIdIn(userIds);
         return orders.stream()
                 .map(orderMapper::toOrderDto)
                 .toList();
@@ -60,7 +61,7 @@ public class OrderService {
         return orderMapper.toOrderDto(order);
     }
     @Transactional
-    public OrderDto update(OrderDto orderDto, UUID id) {
+    public OrderDto update(OrderUpdateDto orderDto, UUID id) {
         return orderMapper.toOrderDto(
                 orderMapper.updateOrder(
                         orderDto,

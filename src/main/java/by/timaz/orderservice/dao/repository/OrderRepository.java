@@ -13,7 +13,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     Optional<Order> findById(UUID id);
     List<Order> findOrdersByIdIsIn(Collection<UUID> ids);
     List<Order> findOrdersByStatusIn(Collection<OrderStatus> statuses);
-    Order updateOrder(Order order);
     void deleteOrderById(UUID id);
-    List<Order> findByUserId(UUID userId);
+
+    List<Order> findByUserIdIn(Collection<UUID> userIds);
 }
