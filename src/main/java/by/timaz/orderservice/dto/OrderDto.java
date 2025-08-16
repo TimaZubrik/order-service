@@ -2,10 +2,8 @@ package by.timaz.orderservice.dto;
 
 import by.timaz.orderservice.dao.entity.OrderStatus;
 import by.timaz.orderservice.dto.validation.ValueOfEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +23,7 @@ import java.util.UUID;
 public class OrderDto implements Serializable {
 
     private UUID id;
+    @Null
     private UUID userId;
 
     @NotNull(message = "Creation date cannot be empty")

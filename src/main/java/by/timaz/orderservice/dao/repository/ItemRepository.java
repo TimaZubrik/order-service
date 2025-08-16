@@ -12,4 +12,8 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
     Optional<Item> findById(UUID id);
     Optional<Item> findByName(String name);
     List<Item> findItemsByNameIn(Collection<String> names);
+
+    List<Item> findItemsByIdIn(Collection<UUID> ids);
+
+    Collection<UUID> id(UUID id);
 }

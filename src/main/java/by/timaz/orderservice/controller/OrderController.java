@@ -1,7 +1,10 @@
 package by.timaz.orderservice.controller;
 
+import by.timaz.orderservice.dao.entity.OrderStatus;
 import by.timaz.orderservice.dto.OrderDto;
+import by.timaz.orderservice.dto.OrderProduct;
 import by.timaz.orderservice.dto.OrderUpdateDto;
+import by.timaz.orderservice.dto.ResponseDto;
 import by.timaz.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,39 +31,51 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping("all")
-    public ResponseEntity<?> getOrders() {
-        return new ResponseEntity<>(orderService.findAll(), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> getOrders(@RequestParam String email) {
+        return new ResponseEntity<>(orderService.findAll(email), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> getOrder(@RequestParam UUID id) {
-        return new ResponseEntity<>(orderService.findById(id), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> getOrder(@RequestParam UUID id,
+                                                @RequestParam String email) {
+        return new ResponseEntity<>(orderService.findById(id,email), HttpStatus.OK);
     }
 
     @GetMapping("by-ids")
-    public ResponseEntity<?> getOrdersByIdIn(@RequestParam Collection<UUID> ids) {
-        return new ResponseEntity<>(orderService.findByIdsIn(ids), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> getOrdersByIdIn(@RequestParam Collection<UUID> ids,
+                                             @RequestParam String email) {
+        return new ResponseEntity<>(orderService.findByIdsIn(ids, email), HttpStatus.OK);
     }
 
     @GetMapping("users")
-    public ResponseEntity<?> getOrdersByUsersIds(@RequestParam Collection<UUID> ids) {
+    public ResponseEntity<List<OrderDto>> getOrdersByUsersIds(@RequestParam Collection<UUID> ids) {
         return new ResponseEntity<>(orderService.findByUserIds(ids), HttpStatus.OK);
     }
 
+    @GetMapping("status")
+    public ResponseEntity<ResponseDto> getOrderStatus(@RequestParam Collection<String> statusList,
+                                                      @RequestParam String email) {
+        return new ResponseEntity<>(orderService.findByStatusIn(statusList, email), HttpStatus.OK);
+    }
+
     @PostMapping
-    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderDto orderDto) {
-        return new ResponseEntity<>(orderService.save(orderDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> createOrder(@RequestBody @Valid List<@Valid OrderProduct> orderRequest,
+                                                    @RequestParam String email) {
+        return new ResponseEntity<>(orderService.save(orderRequest, email), HttpStatus.CREATED);
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateOrder(@RequestBody @Valid OrderUpdateDto orderDto,
-                                         @RequestParam UUID id) {
-        return new ResponseEntity<>(orderService.update(orderDto,id), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> updateOrder(@RequestBody @Valid OrderUpdateDto orderDto,
+                                         @RequestParam UUID id,
+                                         @RequestParam String email) {
+        return new ResponseEntity<>(orderService.update(orderDto,id,email), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteOrder(@RequestParam UUID id) {
-        orderService.delete(id);
+    public ResponseEntity<String> deleteOrder(@RequestParam UUID id,
+                                              @RequestParam String email) {
+        orderService.delete(id,email);
         return new ResponseEntity<>("Order with id= "+id.toString()+" deleted",HttpStatus.OK);
     }
+
 }

@@ -10,16 +10,17 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
-uses = OrderItemMapper.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ItemMapper {
 
-    @Mapping(target = "id", ignore = true)
+
+    @Mapping(target = "orderItems", ignore = true)
     Item toItem(ItemDto itemDto);
 
     ItemDto toItemDto(Item item);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "orderItems", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Item updateItem(ItemUpdateDto itemDto, @MappingTarget Item item);
 }

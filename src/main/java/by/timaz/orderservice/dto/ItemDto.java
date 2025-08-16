@@ -3,6 +3,7 @@ package by.timaz.orderservice.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +12,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto implements Serializable {
+    @Null(message = "ID should be empty. It generates automatically ")
     private UUID id;
 
     @NotBlank(message = "Name cannot be empty")
@@ -35,7 +35,4 @@ public class ItemDto implements Serializable {
             fraction = 2,
     message = "Price must have 8 numbers before the decimal point and 2 after")
     private BigDecimal price;
-
-    @Builder.Default
-    private List<OrderItemDto> orderItems = new ArrayList<>();
 }

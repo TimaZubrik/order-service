@@ -32,6 +32,12 @@ public class ItemService {
                 .map(itemMapper::toItemDto)
                 .toList();
     }
+    public List<ItemDto> findItemsByIdIn(Collection<UUID> ids) {
+        List<Item> items = itemRepository.findItemsByIdIn(ids);
+        return items.stream()
+                .map(itemMapper::toItemDto)
+                .toList();
+    }
 
     public ItemDto findItemById(UUID id) {
         return itemMapper.toItemDto(itemRepository.findById(id)

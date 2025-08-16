@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,33 +28,33 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("all")
-    public ResponseEntity<?> getItems() {
+    public ResponseEntity<List<ItemDto>> getItems() {
         return new ResponseEntity<>(itemService.findAllItems(), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> getItem(@RequestParam UUID id) {
+    public ResponseEntity<ItemDto> getItem(@RequestParam UUID id) {
         return new ResponseEntity<>(itemService.findItemById(id), HttpStatus.OK);
     }
 
     @GetMapping("by-name")
-    public ResponseEntity<?> getItems(@RequestParam Collection<String> names) {
+    public ResponseEntity<List<ItemDto>> getItems(@RequestParam Collection<String> names) {
         return new ResponseEntity<>(itemService.findItemsByNames(names), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<?> createItem(@RequestBody @Valid ItemDto itemDto) {
+    public ResponseEntity<ItemDto> createItem(@RequestBody @Valid ItemDto itemDto) {
         return new ResponseEntity<>(itemService.saveItem(itemDto), HttpStatus.CREATED);
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateItem(@RequestBody @Valid ItemUpdateDto itemDto,
+    public ResponseEntity<ItemDto> updateItem(@RequestBody @Valid ItemUpdateDto itemDto,
                                         @RequestParam UUID id) {
         return new ResponseEntity<>(itemService.updateItem(itemDto, id), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteItem(@RequestParam UUID id) {
+    public ResponseEntity<String> deleteItem(@RequestParam UUID id) {
         itemService.deleteItemById(id);
         return new ResponseEntity<>("Item with id= "+id.toString()+" deleted", HttpStatus.OK);
     }

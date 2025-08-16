@@ -27,4 +27,8 @@ public class OrderUpdateDto {
 
     @Builder.Default
     private List<OrderItemDto> orderItems = new ArrayList<>();
+
+    public void addOrderItem(OrderItemDto orderItem) {
+        orderItems.add(orderItem);
+    }
 }

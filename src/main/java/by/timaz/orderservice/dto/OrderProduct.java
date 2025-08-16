@@ -9,19 +9,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItemDto implements Serializable {
+public class OrderProduct {
+    @NotNull(message = "You should insert item ID")
+    private UUID itemId;
 
-    private UUID id;
-    private ItemDto item;
     @NotNull(message = "Quantity cannot be null")
     @Positive(message = "Quantity must be positive")
     private int quantity;
-
 }
