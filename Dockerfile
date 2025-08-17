@@ -3,13 +3,14 @@ FROM openjdk:24-jdk-slim-bullseye AS builder
 
 WORKDIR /app
 
-COPY --chmod=0755 gradlew .
-COPY gradle gradle
 COPY . .
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN ./gradlew clean bootJar --no-daemon
-
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends dos2unix && \
+    dos2unix gradlew && \
+    chmod +x gradlew && \
+    ./gradlew clean bootJar --no-daemon && \
+    rm -rf /var/lib/apt/lists/*
 # ---- STAGE 2: runtime ----
 FROM openjdk:24-jdk-slim-bullseye
 
