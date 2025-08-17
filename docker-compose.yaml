@@ -1,6 +1,6 @@
 services:
   wiremock:
-    image: rodolphe/wiremock:2.27.2
+    image: wiremock/wiremock:2.35.0-alpine
     networks:
       - micro-net
     healthcheck:
