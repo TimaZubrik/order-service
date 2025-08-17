@@ -3,12 +3,10 @@ FROM openjdk:24-jdk-slim-bullseye AS builder
 
 WORKDIR /app
 
-COPY gradlew .
+COPY --chmod=0755 gradlew .
 COPY gradle gradle
-
-RUN chmod +x ./gradlew
-
 COPY . .
+
 RUN ./gradlew clean bootJar --no-daemon
 
 # ---- STAGE 2: runtime ----
