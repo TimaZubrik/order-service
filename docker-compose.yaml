@@ -35,9 +35,14 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./docker/init:/docker-entrypoint-initdb.d
+  eureka-server:
+    image: timazubr2/service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - micro-net
 volumes:
   db-data:
 networks:
   micro-net:
     driver: bridge
-    external: true
