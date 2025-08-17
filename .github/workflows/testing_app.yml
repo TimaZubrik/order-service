@@ -29,10 +29,10 @@ jobs:
           docker compose up -d db eureka-server
           sleep 10
 
-      - name: Build and test with Gradle
+      - name: Build and test with Gradle (test profile)
         run: |
           ./gradlew clean build \
-            -Dspring.cloud.eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+            -Dspring.profiles.active=test
   build-and-push-image:
     name: Building Docker image
     needs: build-test

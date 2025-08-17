@@ -1,0 +1,17 @@
+spring:
+  profiles: test
+
+  cloud:
+    discovery:
+      enabled: false
+    eureka:
+      client:
+        enabled: false
+        register-with-eureka: false
+        fetch-registry: false
+
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: false
