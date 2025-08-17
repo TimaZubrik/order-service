@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "USER-SERVICE",
-        url  = "${wiremock.server.url}"
+        url  = "${wiremock.server.url:http://wiremock:8080}"
 )
 public interface UserServiceInterface {
     @GetMapping("/user/")

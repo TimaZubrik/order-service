@@ -36,6 +36,7 @@ jobs:
         run: |
           docker compose run --rm app \
             ./gradlew clean build --no-daemon \
+            -Dspring.profiles.active=test \
             -Dwiremock.server.url=http://wiremock:8080
   build-and-push-image:
     name: Building Docker image
