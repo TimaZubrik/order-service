@@ -32,12 +32,14 @@ jobs:
           docker compose up -d db eureka-server wiremock
           sleep 10
 
-      - name: Run tests in container
+      - name: Run tests locally
         run: |
-          docker compose run --rm app \
-            ./gradlew clean build --no-daemon \
+          ./gradlew clean build \
             -Dspring.profiles.active=test \
-            -Dwiremock.server.url=http://wiremock:8080
+            -Dwiremock.server.url=http://localhost:8080
+
+      - name: Tear down
+        run: docker compose down
   build-and-push-image:
     name: Building Docker image
     needs: build-test
