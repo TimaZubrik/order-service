@@ -9,6 +9,9 @@ spring:
         enabled: false
         register-with-eureka: false
         fetch-registry: false
+    openfeign:
+      eager-load:
+        enabled: false
 
 feign:
   httpclient:
