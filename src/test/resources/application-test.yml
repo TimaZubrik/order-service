@@ -4,6 +4,9 @@ spring:
   cloud:
     discovery:
       enabled: false
+    openfeign:
+      eager-load:
+        enabled: false
     eureka:
       client:
         enabled: false

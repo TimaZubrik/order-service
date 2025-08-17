@@ -33,8 +33,10 @@ jobs:
           sleep 10
 
       - name: Run tests in container
-        run: docker compose run --rm app \
-          ./gradlew clean build --no-daemon
+        run: |
+          docker compose run --rm app \
+            ./gradlew clean build --no-daemon \
+            -Dwiremock.server.url=http://wiremock:8080
   build-and-push-image:
     name: Building Docker image
     needs: build-test
