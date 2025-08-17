@@ -20,20 +20,19 @@ jobs:
           cache: gradle
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
+
       - name: Create micro-net network
-        run: |
-          docker network create micro-net || true
-      - name: Start DB and Eureka via Docker Compose
+        run: docker network create micro-net || true
+
+      - name: Start DB & Eureka
         run: |
           docker compose up -d db eureka-server
-          docker compose ps
           sleep 10
+
       - name: Build and test with Gradle
         run: |
           ./gradlew clean build \
             -Dspring.cloud.eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
-      - name: Build with Gradle
-        run: ./gradlew clean build
   build-and-push-image:
     name: Building Docker image
     needs: build-test
