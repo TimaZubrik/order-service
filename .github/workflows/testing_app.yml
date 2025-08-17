@@ -9,8 +9,6 @@ env:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    env:
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://localhost:8761/eureka/
     steps:
       - name: Code check
         uses: actions/checkout@v4
@@ -25,11 +23,15 @@ jobs:
       - name: Create micro-net network
         run: |
           docker network create micro-net || true
-      - name: Start DB via Docker Compose
+      - name: Start DB and Eureka via Docker Compose
         run: |
           docker compose up -d db eureka-server
           docker compose ps
           sleep 10
+      - name: Build and test with Gradle
+        run: |
+          ./gradlew clean build \
+            -Dspring.cloud.eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
       - name: Build with Gradle
         run: ./gradlew clean build
   build-and-push-image:
