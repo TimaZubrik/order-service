@@ -29,10 +29,9 @@ jobs:
           docker compose up -d db eureka-server
           sleep 10
 
-      - name: Build and test with Gradle (test profile)
-        run: |
-          ./gradlew clean build \
-            -Dspring.profiles.active=test
+      - name: Run tests in container
+        run: docker compose run --rm app \
+          ./gradlew clean build --no-daemon
   build-and-push-image:
     name: Building Docker image
     needs: build-test
