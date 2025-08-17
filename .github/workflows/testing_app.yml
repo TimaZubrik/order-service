@@ -4,6 +4,9 @@ on:
   push:
     branches: [test-branch, master]
 env:
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  ORDER_DB_NAME: ${{ secrets.ORDER_DB_NAME }}
   IMAGE_NAME: order-service
   DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/order-service
 jobs:
