@@ -1,10 +1,10 @@
 services:
   wiremock:
-    image: wiremock/wiremock:2.35.0-alpine
+    image: wiremock/wiremock:2.35.0
     networks:
       - micro-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost:8080/__admin" ]
+      test: [ "CMD", "curl", "--fail", "http://localhost:8080/__admin" ]
       interval: 5s
       retries: 5
   app:
