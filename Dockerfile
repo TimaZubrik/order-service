@@ -7,6 +7,7 @@ COPY --chmod=0755 gradlew .
 COPY gradle gradle
 COPY . .
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ./gradlew clean bootJar --no-daemon
 
 # ---- STAGE 2: runtime ----
