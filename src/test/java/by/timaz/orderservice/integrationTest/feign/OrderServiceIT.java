@@ -10,12 +10,12 @@ import by.timaz.orderservice.dto.OrderUpdateDto;
 import by.timaz.orderservice.dto.user.UserDto;
 import by.timaz.orderservice.exceptions.ResourceNotFoundException;
 import by.timaz.orderservice.service.OrderService;
-import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,73 +29,64 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.cloud.contract.wiremock.WireMockSpring.options;
+
 
 @Testcontainers
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "spring.profiles.active=test"
-)
-@AutoConfigureWireMock(port = 0)
-public class OrderServiceIT {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    public class OrderServiceIT {
 
-    @Container
-    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:17.5-alpine3.22"));
-
-    @Autowired
-    private OrderService orderService;
+        @Container
+        static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
+                DockerImageName.parse("postgres:17.5-alpine3.22"));
+    @RegisterExtension
+    static WireMockExtension wireMock = WireMockExtension.newInstance()
+            .options(options().dynamicPort())
+            .build();
 
     @Autowired
-    private OrderRepository orderRepository;
-
+    OrderService orderService;
     @Autowired
-    private ItemRepository itemRepository;
+    OrderRepository orderRepository;
+    @Autowired
+    ItemRepository itemRepository;
 
     @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        static void setProperties(DynamicPropertyRegistry registry) {
+            registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+            registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+            registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
 
-        registry.add("eureka.client.register-with-eureka", () -> "false");
-        registry.add("eureka.client.fetch-registry",       () -> "false");
-        registry.add("spring.cloud.discovery.enabled",     () -> "false");
-    }
+            registry.add("eureka.client.register-with-eureka", () -> "false");
+            registry.add("eureka.client.fetch-registry",       () -> "false");
+            registry.add("spring.cloud.discovery.enabled",     () -> "false");
 
-    @Autowired
-    private WireMockServer wireMockServer;
-
-
-
+            String url = "http://localhost:" + wireMock.getPort();
+            registry.add("spring.cloud.openfeign.client.config.user-service.url", () -> url);
+            System.out.println(">>> Feign URL = " + url);
+        }
     @BeforeEach
-    void resetDbAndStubWireMock() {
+    void setupStubs() {
         orderRepository.deleteAll();
-
-        wireMockServer.resetAll();
-
-        wireMockServer.stubFor(get(urlPathEqualTo("/user/"))
+        itemRepository.deleteAll();
+        wireMock.resetAll();
+        wireMock.stubFor(get(urlPathEqualTo("/user/"))
                 .withQueryParam("email", equalTo("test@example.com"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("""
-                    {
-                      "id":"11111111-1111-1111-1111-111111111111",
-                      "name":"TestName",
-                      "surname":"TestSurname",
-                      "email":"test@example.com",
-                      "birthday":"2000-01-01",
-                      "cards":[]
-                    }
-                    """)
-                )
-        );
+                .willReturn(okJson("""
+        {
+          "id":"11111111-1111-1111-1111-111111111111",
+          "name":"TestName","surname":"TestSurname",
+          "email":"test@example.com","birthday":"2000-01-01","cards":[]
+        }
+      """)));
     }
+
     @Test
     void whenFindAll_thenReturnsOrdersAndUser() {
 
