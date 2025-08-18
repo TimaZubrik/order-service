@@ -9,5 +9,6 @@
     <include file="tables/create-table-order-items.xml" relativeToChangelogFile="true"/>
     <include file="indexes/create-index-items-name.xml" relativeToChangelogFile="true"/>
     <include file="indexes/create-index-orders-creation-date.xml" relativeToChangelogFile="true"/>
+    <include file="indexes/create-index-orders-status.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

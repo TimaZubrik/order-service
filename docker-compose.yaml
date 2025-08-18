@@ -1,0 +1,43 @@
+services:
+  app:
+    image: order-service
+    build:
+      context: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${ORDER_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_LIQUIBASE_ENABLED: true
+      SPRING_LIQUIBASE_CHANGE-LOG: classpath:/db/changelog/changelog.xml
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8081:8081"
+    networks:
+      - micro-net
+  db:
+    image: postgres:17.5-alpine3.22
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${ORDER_DB_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      - micro-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d
+volumes:
+  db-data:
+networks:
+  micro-net:
+    driver: bridge
+    external: true
