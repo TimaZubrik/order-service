@@ -27,16 +27,15 @@ jobs:
       - name: Create micro-net network
         run: docker network create micro-net || true
 
-      - name: Start DB & WireMock
+      - name: Start DB
         run: |
-          docker compose up -d db wiremock
+          docker compose up -d db
           sleep 10
 
       - name: Run tests locally
         run: |
           ./gradlew clean build \
             -Dspring.profiles.active=test \
-            -Dwiremock.server.url=http://localhost:8080
 
       - name: Tear down
         run: docker compose down

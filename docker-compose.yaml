@@ -1,12 +1,4 @@
 services:
-  wiremock:
-    image: wiremock/wiremock:2.35.0
-    networks:
-      - micro-net
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:8080/__admin" ]
-      interval: 5s
-      retries: 5
   app:
     image: order-service
     build:
@@ -14,10 +6,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      wiremock:
-        condition: service_healthy
     environment:
-      WIREMOCK_SERVER_URL: http://wiremock:8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${ORDER_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}

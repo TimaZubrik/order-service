@@ -11,12 +11,15 @@ import by.timaz.orderservice.dto.OrderUpdateDto;
 import by.timaz.orderservice.dto.user.UserDto;
 import by.timaz.orderservice.exceptions.ResourceNotFoundException;
 import by.timaz.orderservice.service.OrderService;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -41,18 +44,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.profiles.active=test"
+)
+@AutoConfigureWireMock(port = 0)
 public class OrderServiceIT {
 
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:17.5-alpine3.22"));
-
-    @Container
-    static GenericContainer<?> wiremock =
-            new GenericContainer<>("wiremock/wiremock:2.35.0-alpine")
-                    .withExposedPorts(8080)
-                    .waitingFor(Wait.forHttp("/__admin/mappings").forStatusCode(200));
 
     @Autowired
     private OrderService orderService;
@@ -72,41 +73,36 @@ public class OrderServiceIT {
         registry.add("eureka.client.register-with-eureka", () -> "false");
         registry.add("eureka.client.fetch-registry",       () -> "false");
         registry.add("spring.cloud.discovery.enabled",     () -> "false");
-
-        registry.add("wiremock.server.url", () -> "http://" +
-                                                  wiremock.getHost() + ":" +
-                                                  wiremock.getMappedPort(8080));
     }
 
-    @BeforeAll
-    static void stubUserService() {
-        WireMock.configureFor(
-                wiremock.getHost(),
-                wiremock.getMappedPort(8080)
-        );
-        stubFor(get(urlPathEqualTo("/user/"))
+    @Autowired
+    private WireMockServer wireMockServer;
+
+
+
+    @BeforeEach
+    void resetDbAndStubWireMock() {
+        orderRepository.deleteAll();
+
+        wireMockServer.resetAll();
+
+        wireMockServer.stubFor(get(urlPathEqualTo("/user/"))
                 .withQueryParam("email", equalTo("test@example.com"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody("""
-                                    {
-                                        "id":"11111111-1111-1111-1111-111111111111",
-                                        "name": "TestName",
-                                        "surname": "TestSurname",
-                                        "email": "test@example.com",
-                                        "birthday": "2000-01-01",
-                                        "cards": []
-                                    }
-                                """)
+                    {
+                      "id":"11111111-1111-1111-1111-111111111111",
+                      "name":"TestName",
+                      "surname":"TestSurname",
+                      "email":"test@example.com",
+                      "birthday":"2000-01-01",
+                      "cards":[]
+                    }
+                    """)
                 )
         );
     }
-
-    @BeforeEach
-    void cleanDb() {
-        orderRepository.deleteAll();
-    }
-
     @Test
     void whenFindAll_thenReturnsOrdersAndUser() {
 
