@@ -26,19 +26,12 @@ jobs:
 
       - name: Create micro-net network
         run: docker network create micro-net || true
-
-      - name: Start DB
-        run: |
-          docker compose up -d db
-          sleep 10
-
+        
       - name: Run tests locally
         run: |
           ./gradlew clean build \
             -Dspring.profiles.active=test \
 
-      - name: Tear down
-        run: docker compose down
   build-and-push-image:
     name: Building Docker image
     needs: build-test

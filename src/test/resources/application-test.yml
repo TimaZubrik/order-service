@@ -9,3 +9,15 @@ spring:
           USER-SERVICE:
             # автоматически подхватит порт, на котором запустился WireMock
             url: http://localhost:${wiremock.server.port}
+    discovery:
+      enabled: false
+    eureka:
+      client:
+        enabled: false
+        register-with-eureka: false
+        fetch-registry: false
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: false
