@@ -27,9 +27,9 @@ jobs:
       - name: Create micro-net network
         run: docker network create micro-net || true
 
-      - name: Start DB, Eureka & WireMock
+      - name: Start DB & WireMock
         run: |
-          docker compose up -d db eureka-server wiremock
+          docker compose up -d db wiremock
           sleep 10
 
       - name: Run tests locally
